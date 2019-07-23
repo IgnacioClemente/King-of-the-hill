@@ -8,7 +8,7 @@ public class DoorScript : MonoBehaviour
 
     bool isOpened = false;
 
-    void OnTriggerEnter(Collider other)
+   private void OnTriggerEnter(Collider other)
     {
         if(!isOpened)
         {

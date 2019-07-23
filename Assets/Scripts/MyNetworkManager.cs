@@ -13,7 +13,13 @@ public class MyNetworkManager : NetworkManager
     {
         var player = Instantiate(playerPrefab, spawnPoints[index].transform.position, playerPrefab.transform.rotation);
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
-        player.GetComponent<CarController>().MyColorIndex = index;
+
+        var auxCarController = player.GetComponent<CarController>();
+        auxCarController.PlayerIndex = index;
+        auxCarController.SpawnPoint = spawnPoints[index].transform.position;
+
         index++;
+
+        GameManager.Instance.AddPlayer(auxCarController);
     }
 }

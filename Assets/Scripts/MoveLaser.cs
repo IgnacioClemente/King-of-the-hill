@@ -8,11 +8,11 @@ public class MoveLaser : MonoBehaviour
     public float speed;
     private Vector3 startPos;
 
-    void Start()
+   private void Start()
     {
         startPos = transform.position;
     }
-    void Update()
+   private void Update()
     {
         Vector3 v = startPos;
         v.x += delta * Mathf.Sin(Time.time * speed);

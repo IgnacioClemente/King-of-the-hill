@@ -7,7 +7,7 @@ public class CheckWin : NetworkBehaviour
 {
     CarController player;
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         player = other.gameObject.GetComponent<CarController>();
         if (other.gameObject.CompareTag("Player"))

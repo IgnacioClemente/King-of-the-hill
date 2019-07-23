@@ -7,22 +7,19 @@ using UnityEngine.UI;
 public class CarController : NetworkBehaviour
 {
     [SerializeField] MeshRenderer mesh;
-    private NetworkStartPosition[] spawnPoints;
-    //public GameObject text_;
 
     [SyncVar(hook = "SetColor")]
-    private int myColorIndex;
+    private int playerIndex;
 
-    public int MyColorIndex { get { return myColorIndex; } set { myColorIndex = value; } }
-    
-    void Start()
-    {
-        spawnPoints = FindObjectsOfType<NetworkStartPosition>();
-    }
+    [SyncVar(hook = "SetPosition")]
+    public Vector3 SpawnPoint;
+
+    public int PlayerIndex { get { return playerIndex; } set { playerIndex = value; } }
 
     public override void OnStartClient()
     {
-        SetColor(myColorIndex);
+        SetColor(playerIndex);
+        SetPosition(SpawnPoint);
     }
 
     void Update()
@@ -48,18 +45,21 @@ public class CarController : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcRespawn()
+    public void RpcEndGame(bool winner)
+    {
+        if (!isLocalPlayer)
+            return;
+
+        GameManager.Instance.SetEndText(winner);
+    }
+
+
+    [ClientRpc]
+    private void RpcRespawn()
     {
         if (isLocalPlayer)
         {
-            Vector3 spawnPoint = Vector3.zero;
-
-            if (spawnPoints != null && spawnPoints.Length > 0)
-            {
-                spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-            }
-
-            transform.position = spawnPoint;
+            transform.position = SpawnPoint;
         }
     }
 
@@ -74,19 +74,18 @@ public class CarController : NetworkBehaviour
     {
         if(isServer)
         {
-            //text_.SetActive(true);
-        }
-
-        if(isClient)
-        {
-
-            //text_.SetActive(false);
+            GameManager.Instance.EndGame(this);
         }
     }
     
     public void SetColor(int colorIndex)
     {
-        myColorIndex = colorIndex;
-        mesh.materials[1].color = GameManager.Instance.Colors[myColorIndex];
+        playerIndex = colorIndex;
+        mesh.materials[1].color = GameManager.Instance.Colors[playerIndex];
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        SpawnPoint = position;
     }
 }

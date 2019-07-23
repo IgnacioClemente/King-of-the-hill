@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
 public class ChangeScene : NetworkBehaviour
 {
-    void Awake()
+    private void Awake()
     {
         int rdm = Random.Range(1,4);
         NetworkManager net;
