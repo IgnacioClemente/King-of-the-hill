@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class DoorScript : MonoBehaviour
 {
-    [SerializeField] GameObject door;
+    [SerializeField] Transform door;
 
     bool isOpened = false;
 
@@ -13,7 +14,8 @@ public class DoorScript : MonoBehaviour
         if(!isOpened)
         {
             isOpened = true;
-            door.transform.position += new Vector3(0, 4, 0);
+            Vector3 endPos = door.transform.position + new Vector3(0, 4, 0);
+            door.DOMove(endPos, 1f).SetEase(Ease.OutQuad);
         }
     }
 }

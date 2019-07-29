@@ -1,15 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     [SerializeField] Color[] colors;
     [SerializeField] Text endGameText;
-
+    [SerializeField] Transform[] spawnPoints;
+    
     private List<CarController> players = new List<CarController>();
 
     private CarController winner;
@@ -21,12 +23,17 @@ public class GameManager : MonoBehaviour
     {
         if (Instance != null)
             Destroy(gameObject);
+
         Instance = this;
     }
 
     public void AddPlayer(CarController player)
     {
         players.Add(player);
+        player.transform.position = spawnPoints[player.PlayerIndex].position;
+        player.SpawnPoint = spawnPoints[player.PlayerIndex].position;
+
+        player.RpcStartPositions(spawnPoints[player.PlayerIndex].position);
     }
 
     public void EndGame(CarController winner)

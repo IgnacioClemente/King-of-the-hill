@@ -1080,3 +1080,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mesh: {fileID: 23032387366614086}
+  SpawnPoint: {x: 0, y: 0, z: 0}

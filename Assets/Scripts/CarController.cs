@@ -34,14 +34,17 @@ public class CarController : NetworkBehaviour
 
         transform.Rotate(0, x, 0);
         transform.Translate(0, 0, z);
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            transform.rotation = Quaternion.Euler(0, transform.forward.magnitude, 0);
+        }
     }
 
-    void FixedUpdate()
+    [ClientRpc]
+    public void RpcStartPositions(Vector3 position)
     {
-        if (transform.rotation == Quaternion.Euler(0, 0, 90) || transform.rotation == Quaternion.Euler(0, 0, -90))
-        {
-            transform.rotation = Quaternion.Euler(0, 90, 0);
-        }
+        transform.position = position;
     }
 
     [ClientRpc]

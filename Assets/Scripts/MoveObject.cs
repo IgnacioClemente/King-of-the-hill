@@ -7,23 +7,28 @@ public class MoveObject : MonoBehaviour
     public float delta;
     public float speed;
     private Vector3 startPos;
+    private Rigidbody rb;
 
    private void Start()
-    {
+   {
         startPos = transform.position;
-    }
-   private void Update()
-    {
+        rb = GetComponent<Rigidbody>();
+   }
+
+   private void FixedUpdate()
+   {
         Vector3 v = startPos;
         v.x += delta * Mathf.Sin(Time.time * speed);
-        transform.position = v;
-    }
+        rb.MovePosition(v);
+        //transform.position = v;
 
+    }
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.transform.SetParent(this.transform);
+            //collision.transform.SetParent(this.transform);
         }
     }
 
@@ -31,8 +36,8 @@ public class MoveObject : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.transform.SetParent(null);
+            //collision.transform.SetParent(null);
         }
-    }
+    }*/
 }
 
