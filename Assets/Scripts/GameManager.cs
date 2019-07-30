@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -9,12 +10,19 @@ public class GameManager : NetworkBehaviour
     public static GameManager Instance { get; private set; }
 
     [SerializeField] Color[] colors;
+    [SerializeField] float timeToChangeLevel;
     [SerializeField] Text endGameText;
+    [SerializeField] Text timer;
+    [SerializeField] Image background;
     [SerializeField] Transform[] spawnPoints;
     
     private List<CarController> players = new List<CarController>();
 
     private CarController winner;
+    private bool endGame;
+
+    [SyncVar(hook = "UpdateTimerText")]
+    private float timeLeft;
 
     public Color[] Colors { get { return colors; } }
 
@@ -25,6 +33,27 @@ public class GameManager : NetworkBehaviour
             Destroy(gameObject);
 
         Instance = this;
+    }
+
+    private void Start()
+    {
+        timeLeft = timeToChangeLevel;
+        timer.text = timeLeft.ToString();
+        background.gameObject.SetActive(false);
+        background.DOFade(0f, 0f);
+    }
+
+    private void Update()
+    {
+        if (endGame && isServer)
+        {
+            timeLeft -= Time.deltaTime;
+            timer.text = ((int)timeLeft).ToString();
+
+            if (timeLeft <= 0)
+                MyNetworkManager.Instance.ChooseScene();
+        }
+
     }
 
     public void AddPlayer(CarController player)
@@ -39,7 +68,7 @@ public class GameManager : NetworkBehaviour
     public void EndGame(CarController winner)
     {
         this.winner = winner;
-
+        endGame = true;
         for (int i = 0; i < players.Count; i++)
         {
             if (players[i] == winner)
@@ -49,9 +78,20 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    public void UpdateTimerText(float time)
+    {
+        this.timeLeft = time;
+
+        timer.text = ((int)timeLeft).ToString();
+    }
+
     public void SetEndText(bool win)
     {
-        if(win)
+        background.gameObject.SetActive(true);
+        background.DOFade(1f, 0.5f);
+        timeLeft = timeToChangeLevel;
+
+        if (win)
         {
             endGameText.color = Color.green;
             endGameText.text = "Ganaste";
