@@ -10,6 +10,10 @@ public class MyNetworkManager : NetworkManager
     public static MyNetworkManager Instance { get; private set; }
 
     private int index;
+    private List<CarController> players = new List<CarController>();
+    private bool gameStarted = true;
+
+    public List<CarController> Players { get { return players; } }
 
     private void Awake()
     {
@@ -25,23 +29,39 @@ public class MyNetworkManager : NetworkManager
 
         print("Spawning player " + index);
 
-        var player = Instantiate(playerPrefab);
+        var player = Instantiate(playerPrefab, new Vector3(100,100,100), playerPrefab.transform.rotation);
+
+        var auxCarController = player.GetComponent<CarController>();
+        auxCarController.PlayerIndex = index;
+        index++;
+
+        players.Add(auxCarController);
+
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
 
         print(index + " " + player);
-        var auxCarController = player.GetComponent<CarController>();
-        auxCarController.PlayerIndex = index;
 
-        print(index + " " + auxCarController);
-        index++;
-
-        GameManager.Instance.AddPlayer(auxCarController);
+        GameManager.Instance.StartPlayers();
     }
 
     public override void OnClientSceneChanged(NetworkConnection conn)
     {
-        ClientScene.AddPlayer(conn, 0);
         base.OnServerSceneChanged(networkSceneName);
+        print(conn.connectionId);
+        print(conn.isConnected);
+            ClientScene.AddPlayer(conn, 0);
+        //ClientScene.Ready(conn);
+    }
+
+    public override void OnClientConnect(NetworkConnection conn)
+    {
+
+    }
+
+    public override void OnServerSceneChanged(string sceneName)
+    {
+        base.OnServerSceneChanged(sceneName);
+        gameStarted = true;
     }
 
     public override void OnStartHost()
@@ -49,6 +69,7 @@ public class MyNetworkManager : NetworkManager
         index = 0;
         if (changeSceneButton != null)
             changeSceneButton.gameObject.SetActive(true);
+
         base.OnStartHost();
     }
 

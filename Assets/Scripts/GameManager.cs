@@ -41,6 +41,11 @@ public class GameManager : NetworkBehaviour
         timer.text = timeLeft.ToString();
         background.gameObject.SetActive(false);
         background.DOFade(0f, 0f);
+        if (isServer)
+        {
+            players = MyNetworkManager.Instance.Players;
+            StartPlayers();
+        }
     }
 
     private void Update()
@@ -53,16 +58,15 @@ public class GameManager : NetworkBehaviour
             if (timeLeft <= 0)
                 MyNetworkManager.Instance.ChooseScene();
         }
-
     }
 
-    public void AddPlayer(CarController player)
+    public void StartPlayers()
     {
-        players.Add(player);
-        player.transform.position = spawnPoints[player.PlayerIndex].position;
-        player.SpawnPoint = spawnPoints[player.PlayerIndex].position;
-
-        player.RpcStartPositions(spawnPoints[player.PlayerIndex].position);
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].SpawnPoint = spawnPoints[i].position;
+            players[i].RpcRespawn();
+        }
     }
 
     public void EndGame(CarController winner)
@@ -78,6 +82,14 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    public void ResetAllPlayers()
+    {
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].RpcRespawn();
+        }
+    }
+
     public void UpdateTimerText(float time)
     {
         this.timeLeft = time;
@@ -90,6 +102,7 @@ public class GameManager : NetworkBehaviour
         background.gameObject.SetActive(true);
         background.DOFade(1f, 0.5f);
         timeLeft = timeToChangeLevel;
+        ResetAllPlayers();
 
         if (win)
         {

@@ -16,18 +16,20 @@ public class CarController : NetworkBehaviour
 
     public int PlayerIndex { get { return playerIndex; } set { playerIndex = value; } }
 
-    public override void OnStartClient()
+    private void Awake()
     {
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public override void OnStartClient()
+    { 
         SetColor(playerIndex);
         SetPosition(SpawnPoint);
     }
 
     void Update()
     {
-        if (!isLocalPlayer)
-        {
-                return;
-        }
+        if (!isLocalPlayer) return;
 
         var x = Input.GetAxis("Horizontal") * Time.deltaTime * 150.0f;
         var z = Input.GetAxis("Vertical") * Time.deltaTime * 3.0f;
@@ -58,7 +60,7 @@ public class CarController : NetworkBehaviour
 
 
     [ClientRpc]
-    private void RpcRespawn()
+    public void RpcRespawn()
     {
         if (isLocalPlayer)
         {
