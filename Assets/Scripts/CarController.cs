@@ -42,13 +42,7 @@ public class CarController : NetworkBehaviour
             transform.rotation = Quaternion.Euler(0, transform.forward.magnitude, 0);
         }
     }
-
-    [ClientRpc]
-    public void RpcStartPositions(Vector3 position)
-    {
-        transform.position = position;
-    }
-
+    
     [ClientRpc]
     public void RpcEndGame(bool winner)
     {
@@ -58,6 +52,12 @@ public class CarController : NetworkBehaviour
         GameManager.Instance.SetEndText(winner);
     }
 
+
+    [ClientRpc]
+    public void RpcSetRespawn(Vector3 position)
+    {
+        SpawnPoint = position;
+    }
 
     [ClientRpc]
     public void RpcRespawn()

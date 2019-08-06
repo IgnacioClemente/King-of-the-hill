@@ -41,6 +41,7 @@ public class GameManager : NetworkBehaviour
         timer.text = timeLeft.ToString();
         background.gameObject.SetActive(false);
         background.DOFade(0f, 0f);
+
         if (isServer)
         {
             players = MyNetworkManager.Instance.Players;
@@ -62,9 +63,10 @@ public class GameManager : NetworkBehaviour
 
     public void StartPlayers()
     {
+        print("inicio de players");
         for (int i = 0; i < players.Count; i++)
         {
-            players[i].SpawnPoint = spawnPoints[i].position;
+            players[i].RpcSetRespawn(spawnPoints[i].position);
             players[i].RpcRespawn();
         }
     }

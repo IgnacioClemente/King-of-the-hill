@@ -25,9 +25,7 @@ public class MyNetworkManager : NetworkManager
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
-        if (networkSceneName == "DefaultScene") return;
-
-        print("Spawning player " + index);
+        //if (networkSceneName == "DefaultScene") return;
 
         var player = Instantiate(playerPrefab, new Vector3(100,100,100), playerPrefab.transform.rotation);
 
@@ -39,9 +37,13 @@ public class MyNetworkManager : NetworkManager
 
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
 
-        print(index + " " + player);
+        print(conn.playerControllers[0].playerControllerId);
+        print(NetworkServer.connections.Count);
+        print("Spawning player " + index);
 
+        print(index + " " + player);
         GameManager.Instance.StartPlayers();
+
     }
 
     public override void OnClientSceneChanged(NetworkConnection conn)
@@ -49,7 +51,33 @@ public class MyNetworkManager : NetworkManager
         base.OnServerSceneChanged(networkSceneName);
         print(conn.connectionId);
         print(conn.isConnected);
-            ClientScene.AddPlayer(conn, 0);
+        print(NetworkClient.allClients.Count);
+        print(NetworkClient.allClients[0].connection.playerControllers.Count);
+        print(conn.playerControllers.Count);
+        bool canContinue = true;
+        /*
+        for (int i = 0; i < NetworkServer.connections.Count; i++)
+        {
+            for (int j = 0; j < NetworkServer.connections[i].playerControllers.Count; j++)
+            {
+                print(NetworkServer.connections[i].playerControllers.Count);
+                if (NetworkServer.connections[i].playerControllers[i].playerControllerId == conn.connectionId)
+                    canContinue = false;
+            }
+        }*/
+        for (int i = 0; i < conn.playerControllers.Count; i++)
+        {
+            if (conn.playerControllers[i].playerControllerId == conn.connectionId)
+                canContinue = false;
+        }
+
+        print(canContinue);
+        ClientScene.Ready(conn);
+        NetworkServer.SpawnObjects();
+
+        if (canContinue)
+            ClientScene.AddPlayer(conn, (short)conn.connectionId);
+
         //ClientScene.Ready(conn);
     }
 
@@ -89,19 +117,13 @@ public class MyNetworkManager : NetworkManager
         {
             default:
                 ServerChangeScene("Mapa 1");
-                NetworkServer.SpawnObjects();
-
-                break;/*
+                break;
             case 2:
                 ServerChangeScene("Mapa 2");
-                NetworkServer.SpawnObjects();
-
                 break;
             case 3:
                 ServerChangeScene("Mapa 3");
-                NetworkServer.SpawnObjects();
-
-                break;*/
+                break;
         }
         if (changeSceneButton != null)
             changeSceneButton.gameObject.SetActive(false);
