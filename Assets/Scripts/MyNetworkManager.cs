@@ -37,23 +37,13 @@ public class MyNetworkManager : NetworkManager
 
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
 
-        print(conn.playerControllers[0].playerControllerId);
-        print(NetworkServer.connections.Count);
-        print("Spawning player " + index);
-
-        print(index + " " + player);
-        GameManager.Instance.StartPlayers();
+        //GameManager.Instance.StartPlayers();
 
     }
 
     public override void OnClientSceneChanged(NetworkConnection conn)
     {
         base.OnServerSceneChanged(networkSceneName);
-        print(conn.connectionId);
-        print(conn.isConnected);
-        print(NetworkClient.allClients.Count);
-        print(NetworkClient.allClients[0].connection.playerControllers.Count);
-        print(conn.playerControllers.Count);
         bool canContinue = true;
         /*
         for (int i = 0; i < NetworkServer.connections.Count; i++)
@@ -71,7 +61,6 @@ public class MyNetworkManager : NetworkManager
                 canContinue = false;
         }
 
-        print(canContinue);
         ClientScene.Ready(conn);
         NetworkServer.SpawnObjects();
 
@@ -95,6 +84,7 @@ public class MyNetworkManager : NetworkManager
     public override void OnStartHost()
     {
         index = 0;
+        players = new List<CarController>();
         if (changeSceneButton != null)
             changeSceneButton.gameObject.SetActive(true);
 
@@ -115,7 +105,7 @@ public class MyNetworkManager : NetworkManager
         int rdm = Random.Range(1, 4);
         switch (rdm)
         {
-            default:
+            case 1:
                 ServerChangeScene("Mapa 1");
                 break;
             case 2:
@@ -123,6 +113,10 @@ public class MyNetworkManager : NetworkManager
                 break;
             case 3:
                 ServerChangeScene("Mapa 3");
+                break;
+
+            default:
+                ServerChangeScene("Mapa 1");
                 break;
         }
         if (changeSceneButton != null)

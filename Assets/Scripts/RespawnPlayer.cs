@@ -14,5 +14,4 @@ public class RespawnPlayer : MonoBehaviour
             player.Death();
         }
     }
-
 }

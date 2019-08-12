@@ -12,7 +12,9 @@ public class CarController : NetworkBehaviour
     private int playerIndex;
 
     [SyncVar(hook = "SetPosition")]
-    public Vector3 SpawnPoint;
+    public Vector3 SpawnPosition;
+    [SyncVar]
+    public Vector3 SpawnRotation;
 
     public int PlayerIndex { get { return playerIndex; } set { playerIndex = value; } }
 
@@ -24,7 +26,7 @@ public class CarController : NetworkBehaviour
     public override void OnStartClient()
     { 
         SetColor(playerIndex);
-        SetPosition(SpawnPoint);
+        SetPosition(SpawnPosition);
     }
 
     void Update()
@@ -39,7 +41,7 @@ public class CarController : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            transform.rotation = Quaternion.Euler(0, transform.forward.magnitude, 0);
+            transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
         }
     }
     
@@ -54,9 +56,10 @@ public class CarController : NetworkBehaviour
 
 
     [ClientRpc]
-    public void RpcSetRespawn(Vector3 position)
+    public void RpcSetRespawn(Vector3 position, Vector3 rotation)
     {
-        SpawnPoint = position;
+        SpawnPosition = position;
+        SpawnRotation = rotation;
     }
 
     [ClientRpc]
@@ -64,7 +67,8 @@ public class CarController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            transform.position = SpawnPoint;
+            transform.position = SpawnPosition;
+            transform.eulerAngles = SpawnRotation;
         }
     }
 
@@ -75,7 +79,8 @@ public class CarController : NetworkBehaviour
         RpcRespawn();
     }
 
-   [Command] public void CmdWhoWon()
+    [Command]
+    public void CmdWhoWon()
     {
         if(isServer)
         {
@@ -91,6 +96,6 @@ public class CarController : NetworkBehaviour
 
     public void SetPosition(Vector3 position)
     {
-        SpawnPoint = position;
+        SpawnPosition = position;
     }
 }

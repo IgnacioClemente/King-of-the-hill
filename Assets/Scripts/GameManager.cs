@@ -41,17 +41,17 @@ public class GameManager : NetworkBehaviour
         timer.text = timeLeft.ToString();
         background.gameObject.SetActive(false);
         background.DOFade(0f, 0f);
+    }
 
-        if (isServer)
-        {
-            players = MyNetworkManager.Instance.Players;
-            StartPlayers();
-        }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        Invoke("StartPlayers",0.5f);
     }
 
     private void Update()
     {
-        if (endGame && isServer)
+        if (endGame && isServer && timeLeft > 0)
         {
             timeLeft -= Time.deltaTime;
             timer.text = ((int)timeLeft).ToString();
@@ -63,10 +63,12 @@ public class GameManager : NetworkBehaviour
 
     public void StartPlayers()
     {
-        print("inicio de players");
+        players = MyNetworkManager.Instance.Players;
+        print(players.Count);
         for (int i = 0; i < players.Count; i++)
         {
-            players[i].RpcSetRespawn(spawnPoints[i].position);
+            print("inicio de player " + i.ToString() + " en " + spawnPoints[i].position);
+            players[i].RpcSetRespawn(spawnPoints[i].position, spawnPoints[i].eulerAngles);
             players[i].RpcRespawn();
         }
     }
